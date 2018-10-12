@@ -4,13 +4,14 @@ Noiseless Touch library for ESP32 (Arduino Core) to get reliable touch events.
 
 ## Usage
 
-The `touchRead(pin)` function measures the capacitive input on a touch pin of
-the ESP32. It returns a value of ~64 (plusminus 10, depending on conditions) 
-when that pin is open, and a value of ~15 (plusminus 10) when that pin is 
-touched by a human.
+The `touchRead(pin)` function (provided by the ESP32 Arduino Core) measures 
+the capacitive input on a touch pin of the ESP32. It returns a value of 
+~64 (plusminus 10, depending on conditions) when that pin is open, and a 
+value of ~15 (plusminus 10) when that pin is touched by a human.
 Variations of the measurements depend on external factors in the surrounding
 of the pin and the cable attached to that pin. During usage, it should not 
-fluctuate by more than plusminus 1.
+fluctuate by more than plusminus 1 (if it does, you've got very high 
+capacitive fluctuations in the environment).
 Depending on your interrupts etc, errorneous measurements may come up.
 
 This library attempts to smooth over errorneous measurements and provide 
@@ -44,7 +45,7 @@ to ignore single extreme outliers. Generally, a reaction is expected after
 history_length/2 measurement runs.
 
 *  Extremely low history length (1..2) = No error correction = Immediate reaction.
-*  Low history length (3..6) = Erratic measurements = Fast reaction.
+*  Low history length (3..7) = Possibly erratic measurements = Fast reaction.
 *  High history length (8..16) = Smoother measurements = Slow reaction.
 
 Hysteresis determines the amount of change that has to happen before the
@@ -53,10 +54,10 @@ it, a hysteresis of 2 would suffice. The touch sensor then might react at
 2 cm distance already (depending on the size of the electrode you use and
 how much of your hand you hold over the electrode). If you want the library
 functions to react only when the electrode really is touched, use a hysteresis
-of more than 16.
+of 16 or more.
 
 *  Low hysteresis (1..2) = Reaction at 2cm or even more distance.
-*  Medium hysteresis (3..15) = Reaction just without touching the electrode.
+*  Medium hysteresis (3..15) = Reaction at 0..2cm distance before touching the electrode.
 *  High hysteresis (16..32) = Reaction on touch.
 *  Extremely high hysteresis (33..63) = May not react.
 
@@ -80,6 +81,7 @@ int distance = touchbutton.read_with_hysteresis();
 Returns the raw value after ignoring outliers, calculating the mean value and
 clamping the value in the current hysteresis range. Generally returns something
 between 0 and 90 (with the normal open value in my setup being between 50 and 70).
+This is the function to use when you need steady measurement values.
 
 ```
 int direction = touchbutton.changed();
