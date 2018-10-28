@@ -2,7 +2,7 @@
 
 Noiseless Touch library for ESP32 (Arduino Core) to get reliable touch events.
 
-## Usage
+## Description
 
 The `touchRead(pin)` function (provided by the ESP32 Arduino Core) measures 
 the capacitive input on a touch pin of the ESP32. It returns a value of 
@@ -25,6 +25,26 @@ outside the hysteresis range, the new value is returned.
 Note that the functions in this library may need multiple runs before they 
 react to a touch. So make sure that you call them once every 10-50 microseconds
 or more often.
+
+### Install
+
+#### Manual Install
+
+Windows: Download the .zip and extract it in Documents\Arduino\Libraries\{Place "NoiselessTouchESP32" folder here}
+
+Linux: Download the .zip and extract it in ~/Sketchbook/Libraries/{Place "NoiselessTouchESP32" folder here}
+
+MacOS: Download the .zip and extract it in ~/Documents/Arduino/libraries/{Place "NoiselessTouchESP32" folder here}
+
+Via Git command line:
+```
+cd <Arduino IDE library folder>
+git clone https://github.com/orithena/NoiselessTouchESP32.git
+```
+
+#### Manually through IDE
+
+Download the .zip, go to Sketch > Include Library > Add .zip Library > Select the downloaded .zip file.
 
 ### Include
 
