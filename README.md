@@ -30,7 +30,7 @@ or more often.
 
 #### Manual Install
 
-Windows: Download the .zip and extract it in Documents\Arduino\Libraries\{Place "NoiselessTouchESP32" folder here}
+Windows: Download the .zip and extract it in Documents\Arduino\Libraries\\\{Place "NoiselessTouchESP32" folder here}
 
 Linux: Download the .zip and extract it in ~/Sketchbook/Libraries/{Place "NoiselessTouchESP32" folder here}
 
