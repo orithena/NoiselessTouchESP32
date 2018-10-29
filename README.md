@@ -24,7 +24,7 @@ outside the hysteresis range, the new value is returned.
 
 Note that the functions in this library may need multiple runs before they 
 react to a touch. So make sure that you run your `loop()` often enough, so that
-the touch measurement function runs every 10-50 microseconds or more often.
+the touch measurement function runs every 10-50 milliseconds or more often.
 
 ### Install
 
@@ -65,8 +65,9 @@ to ignore single extreme outliers. Generally, a reaction is expected after
 history_length/2 measurement runs.
 
 *  Extremely low history length (1..2) = No error correction = Immediate reaction.
-*  Low history length (3..7) = Possibly erratic measurements = Fast reaction.
-*  High history length (8..16) = Smoother measurements = Slow reaction.
+*  Low history length (3..5) = Possibly erratic measurements = Fast reaction.
+*  Medium history length (6..9) = Should work in most environments = Acceptable reaction.
+*  High history length (10..16) = Smoother measurements = Slow reaction.
 
 Hysteresis determines the amount of change that has to happen before the
 output changes. Since the noise on the pin is at plusminus 1 when I tested
@@ -76,12 +77,43 @@ how much of your hand you hold over the electrode). If you want the library
 functions to react only when the electrode really is touched, use a hysteresis
 of 16 or more.
 
-*  Low hysteresis (1..2) = Reaction at 2cm or even more distance.
-*  Medium hysteresis (3..15) = Reaction at 0..2cm distance before touching the electrode.
-*  High hysteresis (16..32) = Reaction on touch.
+*  Extremely low hysteresis (1..2) = Reaction at 1cm or even more distance, may be noisy.
+*  Low hysteresis (3..6) = Reaction at 1cm..0cm distance before touching the electrode.
+*  Medium hysteresis (7..15) = Reaction on tentative touch.
+*  High hysteresis (16..32) = Reaction on distinct touch contact.
 *  Extremely high hysteresis (33..63) = May not react.
 
-### Read functions
+Note: All these value ranges are experimentally determined in my setups. I used
+unshielded cables from the board to the electrode, varying in length from 10 to 20cm.
+I used electrodes ranging from brass thumbtacks with 1cm diameter to aluminium foil
+cut and folded to 1cm x 10cm sheets. Power and signal cables near the touch sensor
+or its cable does make the signal noisier, so avoid that. With low hysteresis, the
+sensor can work through non-conductive material (glass, plastic, wood, ...), but may 
+need a big electrode or the whole hand instead of just a finger.
+
+You will need to experiment a bit on the hysteresis value with your setup. A simple 
+sketch to do so is in the examples.
+
+### Minimal example sketch
+
+```
+#include <NoiselessTouchESP32.h>
+NoiselessTouchESP32 touchsensor(T0);
+
+void setup() {
+  Serial.begin(230400);
+}
+
+void loop() {
+  if( touchsensor.touched() ) {
+    Serial.printf("%d: Touch detected!\n", millis());
+  }
+  delay(50);
+}
+```
+
+
+### Event functions
 
 All functions in this section read the current touch pin value and add it to
 the history. In most cases, you only need one of these functions in your 
@@ -109,6 +141,8 @@ the same as to last call, -1 if the hand moved farther away. This function
 needs low hysteresis to distinguish distances. Depending on the users hand speed,
 this function may return a different amount of -1 and +1!
 
+### Value functions
+
 ```
 int distance = touchbutton.read_with_hysteresis();
 ```
@@ -127,9 +161,11 @@ with a hysteresis value of 0, but the hysteresis value still has meaning
 here for detecting outliers.
 
 
-### Additional functions
+### Report functions
 
-These functions do not read a new value and do not add to the history.
+These functions do not read a new value and do not add to the history. They
+are meant to be used after using an event function to get the value which 
+the last called event function operated on.
 
 ```
 int value = touchbutton.last_value();
@@ -145,4 +181,5 @@ int mean_touch_value_with_old_data = touchbutton.value_from_history();
 Same as `read_raw_mean()`, but without reading a new value from the touch pin.
 This is useful if you use `changed()`, `touching()` or `touched()` to branch
 in your program, but still need the mean touch value over the history
-without hysteresis from that event afterwards.
+without hysteresis from that event afterwards. This function is especially 
+useful for debugging and determining the right history and hysteresis values.
