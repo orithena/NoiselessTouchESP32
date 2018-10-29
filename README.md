@@ -1,6 +1,6 @@
 # NoiselessTouchESP32
 
-Noiseless Touch library for ESP32 (Arduino Core) to get reliable touch events.
+Noiseless Touch library for ESP32 (Arduino Core) to get more reliable touch events.
 
 ## Usage
 
@@ -23,8 +23,9 @@ the hysteresis value, then the old value is returned. If the result is
 outside the hysteresis range, the new value is returned.
 
 Note that the functions in this library may need multiple runs before they 
-react to a touch. So make sure that you call them once every 10-50 microseconds
-or more often.
+react to a touch. So make sure that you run your `loop()` often enough, so that
+the touch measurement function runs every 10-50 microseconds or more often.
+
 
 ### Include
 
@@ -64,32 +65,8 @@ of 16 or more.
 ### Read functions
 
 All functions in this section read the current touch pin value and add it to
-the history.
-
-```
-int distance = touchbutton.read_raw_mean();
-```
-Returns the raw value after ignoring outliers and calculating the mean value.
-Generally returns something between 0 and 90 (with the normal open value in 
-my setup being between 50 and 70). Basically, this is reading the touch button
-with a hysteresis value of 0, but the hysteresis value still has meaning
-here for detecting outliers.
-
-```
-int distance = touchbutton.read_with_hysteresis();
-```
-Returns the raw value after ignoring outliers, calculating the mean value and
-clamping the value in the current hysteresis range. Generally returns something
-between 0 and 90 (with the normal open value in my setup being between 50 and 70).
-This is the function to use when you need steady measurement values.
-
-```
-int direction = touchbutton.changed();
-```
-Returns 1 if the users hand got nearer to the touch pin, 0 if distance stayed
-the same as to last call, -1 if the hand moved farther away. This function
-needs low hysteresis to distinguish distances. Depending on the users hand speed,
-this function may return a different amount of -1 and +1!
+the history. In most cases, you only need one of these functions in your 
+sketch and call it once per `loop()`.
 
 ```
 bool touch_occured = touchbutton.touched();
@@ -105,6 +82,32 @@ Returns true if the user is currently touching, false if not. This is a
 repetitive event, i.e. this function returns true repeatedly if the user
 continues to touch.
 
+```
+int direction = touchbutton.changed();
+```
+Returns 1 if the users hand got nearer to the touch pin, 0 if distance stayed
+the same as to last call, -1 if the hand moved farther away. This function
+needs low hysteresis to distinguish distances. Depending on the users hand speed,
+this function may return a different amount of -1 and +1!
+
+```
+int distance = touchbutton.read_with_hysteresis();
+```
+Returns the raw value after ignoring outliers, calculating the mean value and
+clamping the value in the current hysteresis range. Generally returns something
+between 0 and 90 (with the normal open value in my setup being between 50 and 70).
+This is the function to use when you need steady measurement values.
+
+```
+int distance = touchbutton.read_raw_mean();
+```
+Returns the raw value after ignoring outliers and calculating the mean value.
+Generally returns something between 0 and 90 (with the normal open value in 
+my setup being between 50 and 70). Basically, this is reading the touch button
+with a hysteresis value of 0, but the hysteresis value still has meaning
+here for detecting outliers.
+
+
 ### Additional functions
 
 These functions do not read a new value and do not add to the history.
@@ -114,12 +117,13 @@ int value = touchbutton.last_value();
 ```
 Same as `read_with_hysteresis()`, but without reading a new value from the 
 touch pin. This is useful if you use `changed()`, `touching()` or `touched()`
-to branch in your program, but still need the touch value from that event 
-afterwards.
+to branch in your program, but still need the mean touch value over the
+history with hysteresis from that event afterwards.
 
 ```
 int mean_touch_value_with_old_data = touchbutton.value_from_history();
 ```
 Same as `read_raw_mean()`, but without reading a new value from the touch pin.
-I assume that you will need it only in very special circumstances, which I
-cannot foresee right now.
+This is useful if you use `changed()`, `touching()` or `touched()` to branch
+in your program, but still need the mean touch value over the history
+without hysteresis from that event afterwards.
