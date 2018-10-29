@@ -23,7 +23,7 @@ the hysteresis value, then the old value is returned. If the result is
 outside the hysteresis range, the new value is returned.
 
 Note that the functions in this library may need multiple runs before they 
-react to a touch. So make sure that you call them once every 10-50 microseconds
+react to a touch. So make sure that you call them once every 10-50 milliseconds
 or more often.
 
 ### Install
